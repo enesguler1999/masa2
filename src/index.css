@@ -1,1 +1,187 @@
 @import "tailwindcss";
+
+/* 
+  Tailwind v4's content paths are automatically detected based on import graph usually, 
+  but you can define explicit source paths using @source 
+*/
+@source "../pages/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+@source "../shared/**/*.{js,ts,jsx,tsx}";
+@source "./**/*.{js,ts,jsx,tsx}";
+/* Default for src/ folder */
+
+@theme {
+    /* Screens */
+    --breakpoint-xs: 400px;
+
+    /* Colors */
+    --color-white: #ffffff;
+    --color-white-off: #f0f0eb;
+    --color-black: #000000;
+    --color-black-2: #020202;
+    --color-dark: #232323;
+    --color-dark-2: #848484;
+    --color-grey: #e1e1dc;
+    --color-grey-2: #e6e6e6;
+    --color-grey-3: #caa73e;
+    --color-grey-4: #e8e5e5;
+    --color-grey-5: #e0e0eb;
+    --color-grey-6: #c1c1c1;
+    --color-grey-7: #ededeb;
+    --color-grey-8: #D2D2D2;
+    --color-grey-9: #979797;
+    --color-grey-10: #D9D9D9;
+    --color-grey-11: #CECECE;
+    --color-grey-light: #dadada;
+    --color-grey-light-2: #f0f0f0;
+    --color-grey-light-3: #f3f3f3;
+    --color-grey-light-4: #F4F4F4;
+    --color-grey-light-5: #fcfcfc;
+    --color-grey-light-6: #f8f8f8;
+    --color-grey-light-7: #F8F8F6;
+    --color-grey-light-8: #E9E9E9;
+    --color-grey-light-9: #F1F1EC;
+    --color-grey-light-10: #F7F7F7;
+    --color-grey-light-11: #EFEFEF;
+    --color-grey-light-12: #FF8787;
+    --color-grey-light-13: #e4e4e4;
+    --color-grey-light-14: #F1F1F1;
+    --color-grey-dark: #888888;
+    --color-grey-dark-2: #636363;
+    --color-grey-dark-3: #313255;
+    --color-blue: #440872;
+    --color-blue-2: #224fda;
+    --color-blue-3: #3477C6;
+    --color-blue-4: #1D92FF;
+    --color-azure: #1e91f4;
+    --color-yellow: #f6ca45;
+    --color-yellow-2: #F6CA45;
+    --color-yellow-light: #FFEBAF;
+    --color-orange: #ed6e2d;
+    --color-red: #dd753f;
+    --color-red-2: #E26D6D;
+    --color-red-3: #A05839;
+    --color-red-4: #ff1515;
+    --color-green: #63cb52;
+    --color-green-2: #6AD68F;
+    --color-green-3: #A59050;
+    --color-transparent: transparent;
+
+    /* Box Shadows */
+    --shadow-ms: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
+    --shadow-ms-2: 0 -6px 12px 0 rgba(0, 0, 0, 0.16);
+    --shadow-ms-3: 0 0px 12px 0 rgba(0, 0, 0, 0.26);
+
+    /* Fonts */
+    --font-fonticon: "font-icon";
+    --font-nunito: "Nunito", sans-serif;
+
+    /* Background Images */
+    --background-image-pattern: url('/images/bg-pattern.svg');
+    --background-image-distinction-yellow-top: radial-gradient(circle at top, rgba(255, 255, 255, 0) 10px, #f6ca45 0);
+    --background-image-distinction-yellow-bottom: radial-gradient(circle at bottom, rgba(255, 255, 255, 0) 10px, #f6ca45 0);
+    --background-image-distinction-yellow-left: radial-gradient(circle at left, rgba(255, 255, 255, 0) 18px, #f6ca45 0);
+    --background-image-distinction-yellow-right: radial-gradient(circle at right, rgba(255, 255, 255, 0) 18px, #f6ca45 0);
+    --background-image-distinction-orange-top: radial-gradient(circle at top, rgba(255, 255, 255, 0) 10px, #ed6e2d 0);
+    --background-image-distinction-orange-bottom: radial-gradient(circle at bottom, rgba(255, 255, 255, 0) 10px, #ed6e2d 0);
+    --background-image-distinction-orange-left: radial-gradient(circle at left, rgba(255, 255, 255, 0) 18px, #ed6e2d 0);
+    --background-image-distinction-orange-right: radial-gradient(circle at right, rgba(255, 255, 255, 0) 18px, #ed6e2d 0);
+    --background-image-distinction-grey-top: radial-gradient(circle at top, rgba(255, 255, 255, 0) 10px, #dadada 0);
+    --background-image-distinction-grey-bottom: radial-gradient(circle at bottom, rgba(255, 255, 255, 0) 10px, #dadada 0);
+    --background-image-distinction-grey-left: radial-gradient(circle at left, rgba(255, 255, 255, 0) 18px, #dadada 0);
+    --background-image-distinction-grey-right: radial-gradient(circle at right, rgba(255, 255, 255, 0) 18px, #dadada 0);
+    --background-image-about-figure-1: url('/images/hakkinda-sehrin-ilk-sosyal-etkinlik-agi.jpg');
+    --background-image-about-figure-2: url('/images/hakkinda-kendi-masani-kur.jpg');
+
+    /* Transitions */
+    --ease-custom-cubic: cubic-bezier(.75, .24, .064, 1.20);
+
+    /* Animations */
+    --animate-rot: rot 20s linear infinite;
+    --animate-rot2: rot2 20s linear infinite;
+    --animate-rot3: rot3 7s linear infinite;
+    --animate-rot4: rot4 10s linear infinite;
+
+    @keyframes rot {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes rot2 {
+        0% {
+            transform: rotate(50deg);
+        }
+
+        100% {
+            transform: rotate(410deg);
+        }
+    }
+
+    @keyframes rot3 {
+        0% {
+            transform: rotate(-30deg);
+        }
+
+        25% {
+            transform: rotate(0deg);
+        }
+
+        50% {
+            transform: rotate(30deg);
+        }
+
+        75% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-30deg);
+        }
+    }
+
+    @keyframes rot4 {
+        0% {
+            transform: rotate(-140deg);
+        }
+
+        50% {
+            transform: rotate(-50deg);
+        }
+
+        100% {
+            transform: rotate(-140deg);
+        }
+    }
+}
+
+/* Custom Container Utility since Tailwind v4 handles containers via CSS directly */
+@utility container {
+    margin-inline: auto;
+    padding-inline: 20px;
+    max-width: 100%;
+
+    @variant sm {
+        max-width: 600px;
+    }
+
+    @variant md {
+        max-width: 728px;
+    }
+
+    @variant lg {
+        max-width: 984px;
+    }
+
+    @variant xl {
+        max-width: 1268px;
+    }
+
+    @variant 2xl {
+        max-width: 1268px;
+    }
+}
