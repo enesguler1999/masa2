@@ -10,6 +10,7 @@ export default function Register() {
     const [fullname, setFullname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [mobile, setMobile] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -45,6 +46,7 @@ export default function Register() {
                 fullname,
                 email,
                 password,
+                mobile,
                 isPublic: true,
             };
 
@@ -66,13 +68,9 @@ export default function Register() {
             else if (result.emailVerificationNeeded) {
                 navigate('/verify-email', { state: { email } });
             }
-            // If mobile verification needed
-            else if (result.mobileVerificationNeeded) {
-                navigate('/verify-mobile', { state: { email } });
-            }
-            // Default: manual login after reg
+            // Default: Auto navigate to mobile verify
             else {
-                navigate('/login', { state: { successMessage: 'Kayıt başarılı, lütfen giriş yapın.' } });
+                navigate('/verify-mobile', { state: { email } });
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Hesap oluşturulurken beklenmedik bir hata oluştu.');
@@ -118,6 +116,16 @@ export default function Register() {
                         placeholder="E-posta adresinizi girin"
                         required
                         readOnly={isSocial}
+                    />
+
+                    <Input
+                        id="mobile"
+                        label="Telefon Numarası"
+                        type="tel"
+                        value={mobile}
+                        onChange={(e) => setMobile(e.target.value)}
+                        placeholder="+905554443322"
+                        required
                     />
 
                     <Input
