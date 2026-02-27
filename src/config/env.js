@@ -1,31 +1,56 @@
+// Base URLs for each environment
 export const environments = {
     local: {
-        baseUrl: '',
-        authApi: '',
-        bucketApi: '',
+        code: 'local',
+        label: 'Local',
+        baseUrl: 'http://localhost:3000', // Update as needed
     },
     prw: {
-        baseUrl: 'https://q3xp3masaapp1.prw.mindbricks.com',
-        authApi: 'https://q3xp3masaapp1.prw.mindbricks.com/auth-api',
-        bucketApi: 'https://bucket.prw.mindbricks.com/',
-    },
-    beta: {
-        baseUrl: '',
-        authApi: '',
-        bucketApi: '',
+        code: 'prw',
+        label: 'Preview',
+        baseUrl: 'https://masaapp.prw.mindbricks.com',
     },
     stage: {
-        baseUrl: 'https://q3xp3masaapp1-stage.mindbricks.co',
-        authApi: 'https://q3xp3masaapp1-stage.mindbricks.co/auth-api',
-        bucketApi: 'https://q3xp3masaapp1-stage.mindbricks.co/bucket',
+        code: 'stage',
+        label: 'Staging',
+        baseUrl: 'https://masaapp-stage.mindbricks.co',
     },
     prd: {
-        baseUrl: 'https://q3xp3masaapp1.mindbricks.co',
-        authApi: 'https://q3xp3masaapp1.mindbricks.co/auth-api',
-        bucketApi: 'https://q3xp3masaapp1.mindbricks.co/bucket',
+        code: 'prd',
+        label: 'Production',
+        baseUrl: 'https://masaapp.mindbricks.co',
     },
 };
 
-export const currentEnv = 'prw'; // Default as prw without frontend selector
+// When the application starts, ensure baseUrl is set to the production server URL by default.
+const storedEnv = typeof window !== 'undefined' ? localStorage.getItem('masaEnv') : null;
+export let currentEnv = storedEnv && environments[storedEnv] ? storedEnv : 'stage';
 
-export const config = environments[currentEnv];
+export const setEnv = (envCode) => {
+    if (environments[envCode]) {
+        currentEnv = envCode;
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('masaEnv', envCode);
+            window.location.reload(); // Reload to re-initialize service clients dynamically
+        }
+    }
+};
+
+export const getBaseUrl = () => environments[currentEnv]?.baseUrl || environments['stage'].baseUrl;
+
+export const getServiceUrl = (serviceName) => {
+    const baseUrl = getBaseUrl();
+    return `${baseUrl}/${serviceName}-api`;
+};
+
+// Configuration object with getters for backwards compatibility and easy access
+export const config = {
+    get baseUrl() { return getBaseUrl(); },
+    get authApi() { return getServiceUrl('auth'); },
+    get masaCorporateApi() { return getServiceUrl('masaCorporate'); },
+    get masaTaxonomyApi() { return getServiceUrl('masaTaxonomy'); },
+    get optionsApi() { return getServiceUrl('options'); },
+    get socialApi() { return getServiceUrl('social'); },
+    get ticketApi() { return getServiceUrl('ticket'); },
+    get bucketApi() { return `${getBaseUrl()}/bucket`; }, // fallback for backwards compatibility
+};

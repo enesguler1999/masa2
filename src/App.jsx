@@ -8,6 +8,7 @@ import AuthCallback from './pages/Auth/AuthCallback';
 import VerifyMobile from './pages/Auth/VerifyMobile';
 import VerifyEmail from './pages/Auth/VerifyEmail';
 import ProfileDashboard from './pages/Profile/ProfileDashboard';
+import MessageTest from './pages/Test/MessageTest';
 
 function Home() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/profile" element={<ProfileDashboard />} />
         <Route path="/components" element={<ComponentsPage />} />
+        <Route path="/test/messagetest" element={<MessageTest />} />
       </Routes>
     </BrowserRouter>
   );
