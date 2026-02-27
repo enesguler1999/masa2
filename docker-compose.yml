@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: masa_frontend
+    ports:
+      # Kullanıcının talebi üzerine: host 5173 -> container 80
+      - "5173:80"
+      - "443:443"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
