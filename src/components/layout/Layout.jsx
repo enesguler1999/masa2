@@ -3,7 +3,7 @@ import Header from './Header';
 
 const Layout = ({ children }) => {
     return (
-        <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans">
+        <div id="layout-root" className="min-h-screen text-neutral-900 font-sans">
             <Header />
             <main className="pt-24 px-6 pb-12 max-w-7xl mx-auto">
                 {children}

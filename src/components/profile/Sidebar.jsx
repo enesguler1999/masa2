@@ -150,13 +150,13 @@ export default function Sidebar({ user, activeSection, setActiveSection }) {
                                 onClick={() => navigateSection('update-password')}
                                 className={`block w-full text-left py-2 text-[13.5px] ${activeSection === 'update-password' ? 'text-zinc-900 font-semibold' : 'text-zinc-500 hover:text-zinc-900'}`}
                             >
-                                Parolayı Güncelle
+                                Şifre Güncelle
                             </button>
                             <button
                                 onClick={() => navigateSection('delete-account')}
                                 className={`block w-full text-left py-2 text-[13.5px] ${activeSection === 'delete-account' ? 'text-zinc-900 font-semibold' : 'text-zinc-500 hover:text-red-500'}`}
                             >
-                                Hesabınızı Silin
+                                Hesabı Arşivle
                             </button>
                             <button
                                 onClick={() => navigateSection('help')}

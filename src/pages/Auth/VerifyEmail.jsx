@@ -1,34 +1,75 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import AuthLayout from '../../components/auth/AuthLayout';
 import Input from '../../components/forms/Input';
 import Button from '../../components/common/Button';
 import { verificationService } from '../../services/authService';
 
+const RESEND_COOLDOWN = 60; // seconds
+
 export default function VerifyEmail() {
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [resendLoading, setResendLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+    const [countdown, setCountdown] = useState(RESEND_COOLDOWN);
+    const [canResend, setCanResend] = useState(false);
+    const [startLoading, setStartLoading] = useState(true);
+    const timerRef = useRef(null);
+    const hasSent = useRef(false);
 
     const location = useLocation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    // Look for email in state or search params
     const email = location.state?.email || searchParams.get('email');
     const paramCode = searchParams.get('code');
+
+    const startCountdown = () => {
+        setCountdown(RESEND_COOLDOWN);
+        setCanResend(false);
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+            setCountdown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timerRef.current);
+                    setCanResend(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
 
     useEffect(() => {
         if (!email) {
             navigate('/login');
+            return;
         }
         if (paramCode) {
             setCode(paramCode);
-            // Optionally auto-verify if code exists in URL
         }
-    }, [email, navigate, paramCode]);
+        // Start verification on mount
+        if (!hasSent.current) {
+            hasSent.current = true;
+            (async () => {
+                try {
+                    await verificationService.startEmailVerification(email);
+                    setSuccessMessage('Doğrulama e-postası gönderildi. Lütfen gelen kutunuzu kontrol edin.');
+                    startCountdown();
+                } catch (err) {
+                    setError(err.response?.data?.message || 'E-posta gönderilirken bir hata oluştu.');
+                } finally {
+                    setStartLoading(false);
+                }
+            })();
+        }
+
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleVerify = async (e) => {
         if (e) e.preventDefault();
@@ -52,14 +93,12 @@ export default function VerifyEmail() {
     const handleResend = async () => {
         setError('');
         setSuccessMessage('');
-        setResendLoading(true);
         try {
             await verificationService.startEmailVerification(email);
             setSuccessMessage('Doğrulama e-postası tekrar gönderildi. Lütfen gelen kutunuzu kontrol edin.');
+            startCountdown();
         } catch (err) {
             setError(err.response?.data?.message || 'E-posta gönderilirken bir hata oluştu.');
-        } finally {
-            setResendLoading(false);
         }
     };
 
@@ -71,13 +110,23 @@ export default function VerifyEmail() {
                     Lütfen <strong>{email}</strong> adresinize gönderilen e-postadaki yönlendirmeyi takip edin veya doğrulama kodunu aşağıya girin.
                 </p>
 
-                {error && (
+                {startLoading && (
+                    <div className="mb-6 p-4 bg-zinc-100 text-zinc-600 rounded-xl text-[14px] font-medium border border-zinc-200 leading-relaxed flex items-center gap-3">
+                        <svg className="animate-spin h-4 w-4 text-zinc-500" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Doğrulama e-postası gönderiliyor...
+                    </div>
+                )}
+
+                {error && !startLoading && (
                     <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-[14px] font-medium border border-red-100/50 leading-relaxed shadow-sm">
                         {error}
                     </div>
                 )}
 
-                {successMessage && (
+                {successMessage && !startLoading && (
                     <div className="mb-6 p-4 bg-green-50 text-green-600 rounded-xl text-[14px] font-medium border border-green-100/50 leading-relaxed shadow-sm">
                         {successMessage}
                     </div>
@@ -91,7 +140,6 @@ export default function VerifyEmail() {
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                         placeholder="Eğer kodu manuel girmek isterseniz"
-                        required
                     />
 
                     <Button
@@ -106,14 +154,19 @@ export default function VerifyEmail() {
                 <div className="mt-8 text-center">
                     <p className="text-[15px] text-zinc-600">
                         E-posta gelmedi mi?{' '}
-                        <button
-                            type="button"
-                            onClick={handleResend}
-                            disabled={resendLoading}
-                            className="text-zinc-900 font-medium hover:underline disabled:opacity-50 transition-opacity"
-                        >
-                            {resendLoading ? 'Gönderiliyor...' : 'Tekrar Gönder'}
-                        </button>
+                        {canResend ? (
+                            <button
+                                type="button"
+                                onClick={handleResend}
+                                className="text-zinc-900 font-medium hover:underline transition-opacity"
+                            >
+                                Tekrar Gönder
+                            </button>
+                        ) : (
+                            <span className="text-zinc-400 font-medium">
+                                Tekrar Gönder ({countdown}s)
+                            </span>
+                        )}
                     </p>
                 </div>
             </div>

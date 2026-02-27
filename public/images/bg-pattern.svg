@@ -6,21 +6,21 @@
   </defs>
   <g id="Mask_Group_64" data-name="Mask Group 64" transform="translate(15883 1414)" clip-path="url(#clip-path)">
     <g id="Group_21473" data-name="Group 21473" transform="translate(0 0.001)">
-      <path id="Path_218" data-name="Path 218" d="M384.654,781.914a100.78,100.78,0,1,0,100.78-174.556Z" transform="translate(-15767.482 -1644.59)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_218-2" data-name="Path 218" d="M384.654,781.914a100.78,100.78,0,1,0,100.78-174.556Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -14904.668, -1772.157)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_219" data-name="Path 219" d="M210.726,100a62.234,62.234,0,1,0,107.793,62.234Z" transform="translate(-14876.742 -839.52) rotate(131)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_219-2" data-name="Path 219" d="M210.726,100a62.234,62.234,0,1,0,107.793,62.234Z" transform="translate(-15295.795 -1400.41) rotate(131)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_219-3" data-name="Path 219" d="M214.716,100a91.98,91.98,0,1,0,159.315,91.98Z" transform="matrix(0.94, 0.342, -0.342, 0.94, -15069.676, -1577.187)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_219-4" data-name="Path 219" d="M210.726,100a62.234,62.234,0,1,0,107.793,62.234Z" transform="translate(-14470.833 -1226.207) rotate(131)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_219-5" data-name="Path 219" d="M214.029,100a86.86,86.86,0,1,0,150.446,86.86Z" transform="matrix(-0.559, -0.829, 0.829, -0.559, -15757.238, -888.553)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_219-6" data-name="Path 219" d="M215.533,100A98.073,98.073,0,1,0,385.4,198.072Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -15923.669, -1202.473)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_219-7" data-name="Path 219" d="M215.533,100A98.073,98.073,0,1,0,385.4,198.072Z" transform="translate(-14562.76 -1283.678) rotate(59)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_220" data-name="Path 220" d="M201.437,495.941a107.947,107.947,0,0,0,73.84,202.875Z" transform="translate(-15767.481 -1644.59)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_220-2" data-name="Path 220" d="M201.437,495.941a107.947,107.947,0,0,0,73.84,202.875Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -14904.668, -1755.156)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_221" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="matrix(0.309, 0.951, -0.951, 0.309, -14528.308, -1918.564)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_221-2" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -15815.731, -1235.322)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_221-3" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="translate(-14824.131 -1332.859) rotate(56)" fill="#f0f0f0" fill-rule="evenodd"/>
-      <path id="Path_221-4" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="translate(-15437.131 -1808.651) rotate(56)" fill="#f0f0f0" fill-rule="evenodd"/>
+      <path id="Path_218" data-name="Path 218" d="M384.654,781.914a100.78,100.78,0,1,0,100.78-174.556Z" transform="translate(-15767.482 -1644.59)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_218-2" data-name="Path 218" d="M384.654,781.914a100.78,100.78,0,1,0,100.78-174.556Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -14904.668, -1772.157)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_219" data-name="Path 219" d="M210.726,100a62.234,62.234,0,1,0,107.793,62.234Z" transform="translate(-14876.742 -839.52) rotate(131)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_219-2" data-name="Path 219" d="M210.726,100a62.234,62.234,0,1,0,107.793,62.234Z" transform="translate(-15295.795 -1400.41) rotate(131)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_219-3" data-name="Path 219" d="M214.716,100a91.98,91.98,0,1,0,159.315,91.98Z" transform="matrix(0.94, 0.342, -0.342, 0.94, -15069.676, -1577.187)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_219-4" data-name="Path 219" d="M210.726,100a62.234,62.234,0,1,0,107.793,62.234Z" transform="translate(-14470.833 -1226.207) rotate(131)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_219-5" data-name="Path 219" d="M214.029,100a86.86,86.86,0,1,0,150.446,86.86Z" transform="matrix(-0.559, -0.829, 0.829, -0.559, -15757.238, -888.553)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_219-6" data-name="Path 219" d="M215.533,100A98.073,98.073,0,1,0,385.4,198.072Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -15923.669, -1202.473)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_219-7" data-name="Path 219" d="M215.533,100A98.073,98.073,0,1,0,385.4,198.072Z" transform="translate(-14562.76 -1283.678) rotate(59)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_220" data-name="Path 220" d="M201.437,495.941a107.947,107.947,0,0,0,73.84,202.875Z" transform="translate(-15767.481 -1644.59)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_220-2" data-name="Path 220" d="M201.437,495.941a107.947,107.947,0,0,0,73.84,202.875Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -14904.668, -1755.156)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_221" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="matrix(0.309, 0.951, -0.951, 0.309, -14528.308, -1918.564)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_221-2" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="matrix(0.848, 0.53, -0.53, 0.848, -15815.731, -1235.322)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_221-3" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="translate(-14824.131 -1332.859) rotate(56)" fill="#b0b0b0" fill-rule="evenodd"/>
+      <path id="Path_221-4" data-name="Path 221" d="M631.033,247.144a72.473,72.473,0,0,0-125.527,72.473Z" transform="translate(-15437.131 -1808.651) rotate(56)" fill="#b0b0b0" fill-rule="evenodd"/>
     </g>
   </g>
 </svg>

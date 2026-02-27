@@ -159,6 +159,38 @@
     }
 }
 
+/* Global cursor fix — Tailwind v4 no longer sets cursor:pointer on buttons by default */
+button,
+[role="button"],
+label[for],
+select {
+    cursor: pointer;
+}
+
+/* ─── Global Background Pattern ─────────────────────────────────────────────
+   Layout wrapper'a (#layout-root) arka plan rengi + pattern pseudo-element.
+   bg-neutral-50 Layout.jsx'ten kaldırıldı, buradan CSS ile yönetiliyor.
+──────────────────────────────────────────────────────────────────────────── */
+#layout-root {
+    position: relative;
+    isolation: isolate;
+    background-color: #f5f5f5;
+    /* neutral-50 eşdeğeri */
+}
+
+#layout-root::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url('/images/bg-pattern.svg');
+    background-repeat: repeat-y;
+    background-size: 100% auto;
+    background-position: top center;
+    opacity: 0.05;
+    pointer-events: none;
+}
+
 /* Custom Container Utility since Tailwind v4 handles containers via CSS directly */
 @utility container {
     margin-inline: auto;

@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Plus, User, Bell, MessageCircle, ChevronDown, ChevronUp, CreditCard, KeyRound, LogOut, HelpCircle, Ticket, MapPin, Pencil, Bookmark, Settings, UserMinus } from 'lucide-react';
+import { Plus, User, Bell, MessageCircle, ChevronDown, ChevronUp, CreditCard, KeyRound, LogOut, HelpCircle, Ticket, Pencil, Settings, UserMinus } from 'lucide-react';
 import { authService } from '../../services/authService';
+import { useUser } from '../../context/UserContext';
 
 export default function Header() {
     const location = useLocation();
     const navigate = useNavigate();
     const isHomePage = location.pathname === '/';
 
-    const [user, setUser] = useState(null);
+    const { user, clearUser } = useUser();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
     const [selectedCity, setSelectedCity] = useState('İstanbul');
-    const [profileMenuOpen, setProfileMenuOpen] = useState(true);
-    const [settingsMenuOpen, setSettingsMenuOpen] = useState(true);
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
 
     const profileDropdownRef = useRef(null);
     const cityDropdownRef = useRef(null);
@@ -36,22 +37,10 @@ export default function Header() {
 
     const MOCK_CITIES = ['İstanbul', 'Ankara', 'İzmir', 'Antalya', 'Bursa'];
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const currentUser = await authService.getCurrentUser();
-                setUser(currentUser);
-            } catch (error) {
-                setUser(null);
-            }
-        };
-        checkAuth();
-    }, []);
-
     const handleLogout = async () => {
         try {
             await authService.logout();
-            setUser(null);
+            clearUser();
             navigate('/login');
         } catch (error) {
             console.error('Logout failed', error);
@@ -142,8 +131,8 @@ export default function Header() {
                             onClick={() => navigate('/login')}
                             className={`flex items-center gap-2 pl-1.5 pr-5 py-1.5 rounded-full font-bold text-[14px] transition-colors ${loginBtnClass}`}
                         >
-                            <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
-                                <User size={18} strokeWidth={2.5} className={isHomePage ? 'text-neutral-900' : 'text-white'} />
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isHomePage ? 'bg-black/10' : 'bg-white/20'}`}>
+                                <User size={18} strokeWidth={2.5} className={isHomePage ? 'text-white' : 'text-neutral-900'} />
                             </div>
                             Giriş Yap
                         </button>
@@ -226,20 +215,6 @@ export default function Header() {
                                                         <div className="w-5 flex justify-center"><User size={18} strokeWidth={2.5} className="text-zinc-800" /></div>
                                                         <span className="font-bold text-[14px] text-zinc-800">Bilgilerim</span>
                                                     </Link>
-                                                    <Link
-                                                        to="/profile" state={{ section: 'my-info' }} onClick={() => setDropdownOpen(false)}
-                                                        className="flex items-center gap-4 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors"
-                                                    >
-                                                        <div className="w-5 flex justify-center"><MapPin size={18} strokeWidth={2.5} className="text-zinc-800" /></div>
-                                                        <span className="font-bold text-[14px] text-zinc-800">Adresim</span>
-                                                    </Link>
-                                                    <Link
-                                                        to="/profile" state={{ section: 'my-info' }} onClick={() => setDropdownOpen(false)}
-                                                        className="flex items-center gap-4 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors"
-                                                    >
-                                                        <div className="w-5 flex justify-center"><Bookmark size={18} strokeWidth={2.5} className="text-zinc-800" /></div>
-                                                        <span className="font-bold text-[14px] text-zinc-800">İlgi Alanlarım</span>
-                                                    </Link>
                                                 </div>
                                             )}
 
@@ -271,14 +246,14 @@ export default function Header() {
                                                         className="flex items-center gap-4 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors"
                                                     >
                                                         <div className="w-5 flex justify-center"><KeyRound size={18} strokeWidth={2.5} className="text-zinc-800" /></div>
-                                                        <span className="font-bold text-[14px] text-zinc-800">Parolayı Güncelle</span>
+                                                        <span className="font-bold text-[14px] text-zinc-800">Şifre Güncelle</span>
                                                     </Link>
                                                     <Link
                                                         to="/profile" state={{ section: 'delete-account' }} onClick={() => setDropdownOpen(false)}
                                                         className="flex items-center gap-4 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors"
                                                     >
                                                         <div className="w-5 flex justify-center"><UserMinus size={18} strokeWidth={2.5} className="text-zinc-800" /></div>
-                                                        <span className="font-bold text-[14px] text-zinc-800">Hesabınızı Silin</span>
+                                                        <span className="font-bold text-[14px] text-zinc-800">Hesabı Arşivle</span>
                                                     </Link>
                                                     <Link
                                                         to="/profile" state={{ section: 'help' }} onClick={() => setDropdownOpen(false)}

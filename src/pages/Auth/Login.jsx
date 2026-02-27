@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/common/Button';
 import Link from '../../components/common/Link';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { authService } from '../../services/authService';
 import Input from '../../components/forms/Input';
+import { useUser } from '../../context/UserContext';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { refreshUser } = useUser();
     const navigate = useNavigate();
+    const location = useLocation();
+    const locationSuccessMessage = location.state?.successMessage || '';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,7 +29,7 @@ export default function Login() {
             });
 
             if (result.accessToken) {
-                // Assume context/state management is handled via higher level or simply navigate
+                await refreshUser(); // Sync context so Header updates immediately
                 navigate('/');
             }
         } catch (err) {
@@ -55,6 +59,12 @@ export default function Login() {
             <div className="w-full">
                 <h1 className="text-3xl font-bold text-zinc-900 mb-2 mt-4 tracking-tight">Tekrar Hoş Geldiniz</h1>
                 <p className="text-zinc-500 mb-8 text-[15px]">Masa'ya giriş yapın ve etrafınızdaki etkinlikleri keşfetmeye kaldığınız yerden devam edin.</p>
+
+                {locationSuccessMessage && (
+                    <div className="mb-6 p-4 bg-green-50 text-green-600 rounded-xl text-[14px] font-medium border border-green-100/50 leading-relaxed shadow-sm">
+                        {locationSuccessMessage}
+                    </div>
+                )}
 
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-[14px] font-medium border border-red-100/50 leading-relaxed shadow-sm">
