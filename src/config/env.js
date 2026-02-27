@@ -24,7 +24,7 @@ export const environments = {
 
 // When the application starts, ensure baseUrl is set to the production server URL by default.
 const storedEnv = typeof window !== 'undefined' ? localStorage.getItem('masaEnv') : null;
-export let currentEnv = storedEnv && environments[storedEnv] ? storedEnv : 'stage';
+export let currentEnv = storedEnv && environments[storedEnv] ? storedEnv : 'prd';
 
 export const setEnv = (envCode) => {
     if (environments[envCode]) {
@@ -36,7 +36,7 @@ export const setEnv = (envCode) => {
     }
 };
 
-export const getBaseUrl = () => environments[currentEnv]?.baseUrl || environments['stage'].baseUrl;
+export const getBaseUrl = () => environments[currentEnv]?.baseUrl || environments['prd'].baseUrl;
 
 export const getServiceUrl = (serviceName) => {
     const baseUrl = getBaseUrl();

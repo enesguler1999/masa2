@@ -4,6 +4,7 @@ import React, { forwardRef } from 'react';
 const Input = forwardRef(({
     label,
     error,
+    suffix,
     className = '',
     containerClassName = '',
     ...props
@@ -24,10 +25,16 @@ const Input = forwardRef(({
             focus:bg-white focus:border-black focus:outline-none
             disabled:bg-neutral-50 disabled:text-neutral-400
             transition-all duration-200 ${error ? '!border-red-500 bg-red-50' : ''}
+            ${suffix ? 'pr-11' : ''}
             ${className}
           `}
                     {...props}
                 />
+                {suffix && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
+                        {suffix}
+                    </div>
+                )}
             </div>
             {error && (
                 <span className="text-xs text-red-500 ml-1 font-medium">{error}</span>

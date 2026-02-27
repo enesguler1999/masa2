@@ -10,24 +10,21 @@ import Input from '../../components/forms/Input';
 import { useUser } from '../../context/UserContext';
 
 const RESEND_COOLDOWN = 60;
-const STEPS = ['Bilgiler', 'Şifre', 'Doğrulama', 'Profil Fotoğrafı'];
 
 export default function Register() {
-    // Step state
+    // Step state  (1 = Bilgiler, 2 = Doğrulama, 3 = Profil Fotoğrafı)
     const [step, setStep] = useState(1);
 
-    // Step 1
+    // Step 1 – all info + password
     const [fullname, setFullname] = useState('');
     const [email, setEmail] = useState('');
-    const [mobile, setMobile] = useState('');          // final value sent to backend e.g. +905554035730
+    const [mobile, setMobile] = useState('');
     const [countryCode, setCountryCode] = useState('+90');
-    const [phoneDigits, setPhoneDigits] = useState(''); // raw digits only e.g. 5554035730
-
-    // Step 2
+    const [phoneDigits, setPhoneDigits] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordConfirm, setPasswordConfirm] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
-    // Step 3 – verification
+    // Step 2 – verification
     const [verifyCode, setVerifyCode] = useState('');
     const [verifyLoading, setVerifyLoading] = useState(false);
     const [verifyStartLoading, setVerifyStartLoading] = useState(false);
@@ -37,12 +34,11 @@ export default function Register() {
     const verificationStarted = useRef(false);
 
     // After registration
-    const [registeredUser, setRegisteredUser] = useState(null); // user object from register
-    const [sessionToken, setSessionToken] = useState(null);     // token after auto-login
+    const [sessionToken, setSessionToken] = useState(null);
     const [sessionBucketToken, setSessionBucketToken] = useState(null);
     const [sessionUserId, setSessionUserId] = useState(null);
 
-    // Step 4 – avatar
+    // Step 3 – avatar
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
     const [avatarUploading, setAvatarUploading] = useState(false);
@@ -91,9 +87,9 @@ export default function Register() {
         return () => { if (timerRef.current) clearInterval(timerRef.current); };
     }, []);
 
-    // ─── Step 3: start phone verification after register ─────────────────────
+    // ─── Step 2: start phone verification after register ─────────────────────
     useEffect(() => {
-        if (step === 3 && !verificationStarted.current) {
+        if (step === 2 && !verificationStarted.current) {
             verificationStarted.current = true;
             (async () => {
                 setVerifyStartLoading(true);
@@ -112,8 +108,7 @@ export default function Register() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [step]);
 
-    // ─── Step 1 submit ────────────────────────────────────────────────────────
-    // Format digits as XXX-XXX-XXXX
+    // ─── Phone helpers ────────────────────────────────────────────────────────
     const formatPhoneDisplay = (digits) => {
         const d = digits.replace(/\D/g, '').slice(0, 10);
         if (d.length <= 3) return d;
@@ -127,22 +122,16 @@ export default function Register() {
         setMobile(`${countryCode}${raw}`);
     };
 
-    const handleStep1 = (e) => {
+    // ─── Step 1 submit – validate info + register ─────────────────────────────
+    const handleStep1 = async (e) => {
         e.preventDefault();
         setError('');
         setSuccessMessage('');
         if (!fullname.trim()) return setError('Lütfen adınızı ve soyadınızı girin.');
         if (!email.trim()) return setError('Lütfen e-posta adresinizi girin.');
         if (phoneDigits.length < 10) return setError('Lütfen geçerli bir telefon numarası girin (10 rakam).');
-        setStep(2);
-    };
-
-    // ─── Step 2 submit ────────────────────────────────────────────────────────
-    const handleStep2 = async (e) => {
-        e.preventDefault();
-        setError('');
         if (password.length < 6) return setError('Şifre en az 6 karakter olmalıdır.');
-        if (password !== passwordConfirm) return setError('Şifreler eşleşmiyor.');
+
         setLoading(true);
         try {
             const payload = { fullname, email, password, mobile, isPublic: true };
@@ -150,10 +139,6 @@ export default function Register() {
 
             const result = await authService.registerUser(payload);
 
-            // Store registered user info
-            setRegisteredUser(result.user);
-
-            // If register returned an accessToken (auto-login), store it
             if (result.accessToken) {
                 localStorage.setItem('accessToken', result.accessToken);
                 setSessionToken(result.accessToken);
@@ -164,8 +149,7 @@ export default function Register() {
             sessionStorage.removeItem('socialAccountInfo');
             sessionStorage.removeItem('socialCode');
 
-            // Proceed to phone verification step
-            setStep(3);
+            setStep(2);
         } catch (err) {
             setError(err.response?.data?.message || 'Hesap oluşturulurken beklenmedik bir hata oluştu.');
         } finally {
@@ -173,7 +157,7 @@ export default function Register() {
         }
     };
 
-    // ─── Step 3: resend code ──────────────────────────────────────────────────
+    // ─── Step 2: resend code ──────────────────────────────────────────────────
     const handleResendCode = async () => {
         setError('');
         setSuccessMessage('');
@@ -186,7 +170,7 @@ export default function Register() {
         }
     };
 
-    // ─── Step 3: verify code → auto-login ────────────────────────────────────
+    // ─── Step 2: verify code → auto-login ────────────────────────────────────
     const handleVerify = async (e) => {
         e.preventDefault();
         setError('');
@@ -194,7 +178,6 @@ export default function Register() {
         try {
             const result = await verificationService.completeMobileVerification(email, verifyCode);
             if (result.isVerified) {
-                // Auto-login
                 try {
                     const loginResult = await authService.login({ username: email, password });
                     if (loginResult.accessToken) {
@@ -204,9 +187,9 @@ export default function Register() {
                         setSessionBucketToken(loginResult.userBucketToken || null);
                     }
                 } catch (_) {
-                    // Login may fail if already logged in from register response, proceed anyway
+                    // Already logged in from register response, proceed anyway
                 }
-                setStep(4);
+                setStep(3);
             } else {
                 setError('Doğrulama başarısız oldu. Lütfen tekrar deneyin.');
             }
@@ -217,7 +200,7 @@ export default function Register() {
         }
     };
 
-    // ─── Step 4: file select ──────────────────────────────────────────────────
+    // ─── Step 3: file select ──────────────────────────────────────────────────
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -225,18 +208,16 @@ export default function Register() {
         setAvatarPreview(URL.createObjectURL(file));
     };
 
-    // ─── Step 4: upload & finish ──────────────────────────────────────────────
+    // ─── Step 3: upload & finish ──────────────────────────────────────────────
     const handleAvatarUpload = async () => {
         setError('');
         if (!avatarFile) {
-            // Skip avatar, go home
             await refreshUser();
             navigate('/');
             return;
         }
         setAvatarUploading(true);
         try {
-            // We need the bucket token. Try from session state or fetch /currentuser
             let bucketToken = sessionBucketToken;
             let userId = sessionUserId;
 
@@ -253,13 +234,11 @@ export default function Register() {
             if (!bucketToken) throw new Error('Bucket token alınamadı.');
             if (!userId) throw new Error('Kullanıcı kimliği alınamadı.');
 
-            // Upload to user's public bucket
             const bucketId = `${userId}-public-user-bucket`;
             const uploadResult = await bucketService.uploadFile(bucketToken, bucketId, avatarFile);
             const downloadUrl = uploadResult?.data?.[0]?.downloadUrl;
 
             if (downloadUrl) {
-                // Update user profile with the avatar URL
                 await profileService.updateProfile(userId, { avatar: downloadUrl });
             }
 
@@ -282,46 +261,6 @@ export default function Register() {
         authService.initiateSocialLogin('google');
     };
 
-    // ─── Step indicator ───────────────────────────────────────────────────────
-    const StepIndicator = () => (
-        <div className="flex items-center justify-between mb-8 relative">
-            <div className="absolute top-[15px] left-0 right-0 h-[2px] bg-zinc-200 z-0">
-                <div
-                    className="h-full bg-black transition-all duration-500"
-                    style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
-                />
-            </div>
-            {STEPS.map((label, i) => {
-                const stepNum = i + 1;
-                const isActive = step === stepNum;
-                const isDone = step > stepNum;
-                return (
-                    <div key={i} className="flex flex-col items-center z-10 gap-1.5">
-                        <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${isDone
-                                ? 'bg-black text-white'
-                                : isActive
-                                    ? 'bg-black text-white ring-4 ring-black/10'
-                                    : 'bg-zinc-200 text-zinc-400'
-                                }`}
-                        >
-                            {isDone ? (
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                            ) : (
-                                stepNum
-                            )}
-                        </div>
-                        <span className={`text-[11px] font-medium hidden sm:block ${isActive ? 'text-zinc-900' : 'text-zinc-400'}`}>
-                            {label}
-                        </span>
-                    </div>
-                );
-            })}
-        </div>
-    );
-
     // ─── Render ───────────────────────────────────────────────────────────────
     return (
         <AuthLayout>
@@ -330,8 +269,6 @@ export default function Register() {
                 <p className="text-zinc-500 mb-8 text-[15px]">
                     Masa'ya katılın ve yakınınızdaki yeni deneyimleri keşfetmeye hemen başlayın.
                 </p>
-
-                <StepIndicator />
 
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-[14px] font-medium border border-red-100/50 leading-relaxed shadow-sm">
@@ -344,7 +281,7 @@ export default function Register() {
                     </div>
                 )}
 
-                {/* ── Step 1: Name, Email, Phone ── */}
+                {/* ── Step 1: Bilgiler (Name, Email, Phone, Password) ── */}
                 {step === 1 && (
                     <form onSubmit={handleStep1} className="space-y-4">
                         <Input
@@ -367,11 +304,11 @@ export default function Register() {
                             required
                             readOnly={isSocial}
                         />
+
                         {/* ── Phone field with country code selector ── */}
                         <div>
                             <label className="block text-[13px] font-semibold text-zinc-700 mb-1.5">Telefon Numarası</label>
                             <div className="flex rounded-xl overflow-hidden border border-zinc-200 bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-zinc-400 transition-all">
-                                {/* Country code selector */}
                                 <select
                                     value={countryCode}
                                     onChange={(e) => {
@@ -382,7 +319,6 @@ export default function Register() {
                                 >
                                     <option value="+90">🇹🇷 +90</option>
                                 </select>
-                                {/* Number input with auto-format */}
                                 <input
                                     id="mobile"
                                     type="tel"
@@ -395,8 +331,39 @@ export default function Register() {
                                 />
                             </div>
                         </div>
-                        <Button type="submit" className="w-full mt-4 h-[52px] !rounded-xl">
-                            Devam Et
+
+                        <Input
+                            id="password"
+                            label="Şifre"
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="En az 6 karakter"
+                            required
+                            suffix={
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    className="text-zinc-400 hover:text-zinc-700 transition-colors focus:outline-none"
+                                    tabIndex={-1}
+                                    aria-label={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
+                                >
+                                    {showPassword ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    )}
+                                </button>
+                            }
+                        />
+
+                        <Button type="submit" disabled={loading} className="w-full mt-4 h-[52px] !rounded-xl">
+                            {loading ? 'Hesap oluşturuluyor...' : 'Devam Et'}
                         </Button>
 
                         <div className="mt-8 relative">
@@ -426,55 +393,8 @@ export default function Register() {
                     </form>
                 )}
 
-                {/* ── Step 2: Password ── */}
+                {/* ── Step 2: Doğrulama ── */}
                 {step === 2 && (
-                    <form onSubmit={handleStep2} className="space-y-4">
-                        <div className="p-3 bg-zinc-100 rounded-xl text-[13px] text-zinc-500 mb-2">
-                            <span className="font-medium text-zinc-700">{fullname}</span> · {email} · <span className="font-mono">{countryCode} {formatPhoneDisplay(phoneDigits)}</span>
-                        </div>
-
-                        <Input
-                            id="password"
-                            label="Şifre"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="En az 6 karakter"
-                            required
-                            autoFocus
-                        />
-                        <Input
-                            id="password-confirm"
-                            label="Şifre (Tekrar)"
-                            type="password"
-                            value={passwordConfirm}
-                            onChange={(e) => setPasswordConfirm(e.target.value)}
-                            placeholder="Şifrenizi tekrar girin"
-                            required
-                        />
-
-                        <div className="flex gap-3 pt-2">
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={() => { setError(''); setStep(1); }}
-                                className="flex-1 h-[52px] !rounded-xl"
-                            >
-                                Geri
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="flex-[2] h-[52px] !rounded-xl"
-                            >
-                                {loading ? 'Hesap oluşturuluyor...' : 'Hesap Oluştur'}
-                            </Button>
-                        </div>
-                    </form>
-                )}
-
-                {/* ── Step 3: Mobile Verification ── */}
-                {step === 3 && (
                     <div>
                         {verifyStartLoading && (
                             <div className="mb-6 p-4 bg-zinc-100 text-zinc-600 rounded-xl text-[14px] font-medium border border-zinc-200 leading-relaxed flex items-center gap-3">
@@ -532,8 +452,8 @@ export default function Register() {
                     </div>
                 )}
 
-                {/* ── Step 4: Profile Photo ── */}
-                {step === 4 && (
+                {/* ── Step 3: Profil Fotoğrafı ── */}
+                {step === 3 && (
                     <div className="flex flex-col items-center">
                         <p className="text-zinc-500 text-[15px] mb-8 text-center">
                             Profilinize bir fotoğraf ekleyin. İstediğiniz zaman değiştirebilirsiniz.
