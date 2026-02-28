@@ -9,15 +9,83 @@ import Modal from '../components/common/Modal';
 import Table, { TableHead, TableBody, TableRow, TableHeader, TableCell } from '../components/common/Table';
 import SearchBar from '../components/forms/SearchBar';
 import Slider from '../components/forms/Slider';
+import Checkbox from '../components/forms/Checkbox';
 import MasaSpinner from '../components/common/MasaSpinner';
+import { useToast } from '../components/common/Toast';
 
 function ComponentsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [sliderValue, setSliderValue] = useState(50);
     const [searchValue, setSearchValue] = useState('');
+    const [cbDefault, setCbDefault] = useState(false);
+    const [cbChecked, setCbChecked] = useState(true);
+    const [cbSmall, setCbSmall] = useState(false);
+    const [cbLarge, setCbLarge] = useState(false);
+    const [cbError, setCbError] = useState(false);
+    const { showToast } = useToast();
 
     return (
         <Layout>
+
+            {/* ── Toast Notifications section ── */}
+            <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-6">Toast Notifications</h2>
+                <Card className="space-y-4">
+                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Variant'lar</p>
+                    <div className="flex flex-wrap gap-3">
+                        <Button
+                            size="sm"
+                            onClick={() => showToast({ message: 'İşlem başarıyla tamamlandı!', variant: 'success' })}
+                            className="!bg-green-500 hover:!bg-green-600"
+                        >
+                            ✅ Success
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={() => showToast({ message: 'Bir hata oluştu. Lütfen tekrar deneyin.', variant: 'error' })}
+                            className="!bg-red-500 hover:!bg-red-600"
+                        >
+                            ❌ Error
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={() => showToast({ message: 'Bu işlemi yapmak üzerinizsiniz, dikkat edin!', variant: 'warning' })}
+                            className="!bg-yellow-400 hover:!bg-yellow-500 !text-zinc-900"
+                        >
+                            ⚠️ Warning
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={() => showToast({ message: 'Yeni bir güncelleme mevcut.', variant: 'info' })}
+                            className="!bg-blue-500 hover:!bg-blue-600"
+                        >
+                            ℹ️ Info
+                        </Button>
+                    </div>
+                    <div className="w-full h-px bg-neutral-100" />
+                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Uzun süre (8sn)</p>
+                    <div className="flex flex-wrap gap-3">
+                        <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => showToast({ message: 'Bu bildirim 8 saniye görünür kalır.', variant: 'info', duration: 8000 })}
+                        >
+                            8 sn Toast
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => {
+                                showToast({ message: 'Birinci bildirim!', variant: 'success', duration: 5000 });
+                                setTimeout(() => showToast({ message: 'İkinci bildirim!', variant: 'warning', duration: 5000 }), 600);
+                                setTimeout(() => showToast({ message: 'Üçüncü bildirim!', variant: 'error', duration: 5000 }), 1200);
+                            }}
+                        >
+                            Çoklu Toast
+                        </Button>
+                    </div>
+                </Card>
+            </section>
 
             {/* ── Spinners & Loaders section (full width) ── */}
             <section className="mb-10">
@@ -169,6 +237,55 @@ function ComponentsPage() {
                                     min={0}
                                     max={100}
                                 />
+                            </div>
+
+                            <div className="flex flex-col gap-4 pt-4 border-t border-neutral-100">
+                                <h3 className="text-lg font-bold">Checkboxes</h3>
+                                <div className="flex flex-col gap-3">
+                                    <Checkbox
+                                        id="cb-demo-default"
+                                        checked={cbDefault}
+                                        onChange={(e) => setCbDefault(e.target.checked)}
+                                        label="Varsayılan checkbox (md)"
+                                    />
+                                    <Checkbox
+                                        id="cb-demo-checked"
+                                        checked={cbChecked}
+                                        onChange={(e) => setCbChecked(e.target.checked)}
+                                        label="Başlangıçta işaretli"
+                                    />
+                                    <Checkbox
+                                        id="cb-demo-small"
+                                        size="sm"
+                                        checked={cbSmall}
+                                        onChange={(e) => setCbSmall(e.target.checked)}
+                                        label="Küçük boyut (sm)"
+                                    />
+                                    <Checkbox
+                                        id="cb-demo-large"
+                                        size="lg"
+                                        checked={cbLarge}
+                                        onChange={(e) => setCbLarge(e.target.checked)}
+                                        label="Büyük boyut (lg)"
+                                    />
+                                    <Checkbox
+                                        id="cb-demo-error"
+                                        checked={cbError}
+                                        onChange={(e) => setCbError(e.target.checked)}
+                                        error={!cbError ? 'Bu alanı onaylamanız zorunludur.' : ''}
+                                        label={
+                                            <span>
+                                                <a href="#" className="underline underline-offset-2 hover:text-zinc-900 transition-colors">Kullanım Koşulları</a>'nı kabul ediyorum.
+                                            </span>
+                                        }
+                                    />
+                                    <Checkbox
+                                        id="cb-demo-disabled"
+                                        checked={false}
+                                        disabled
+                                        label="Devre dışı checkbox"
+                                    />
+                                </div>
                             </div>
 
                             <div className="pt-2">

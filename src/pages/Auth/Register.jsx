@@ -7,8 +7,10 @@ import { authService, verificationService } from '../../services/authService';
 import { bucketService } from '../../services/bucketService';
 import { profileService } from '../../services/profileService';
 import Input from '../../components/forms/Input';
+import Checkbox from '../../components/forms/Checkbox';
 import { useUser } from '../../context/UserContext';
 import { supportedCountryService } from '../../services/masaSettingsService';
+import { resolveApiError, isValidEmail } from '../../utils/formValidation';
 
 const FALLBACK_COUNTRIES = [{ id: 'tr', code: '+90', country: 'Türkiye', sortOrder: 1 }];
 
@@ -30,6 +32,8 @@ export default function Register() {
     const [countriesLoading, setCountriesLoading] = useState(true);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [acceptKvkk, setAcceptKvkk] = useState(false);
+    const [acceptTerms, setAcceptTerms] = useState(false);
 
     // Step 2 – verification
     const [verifyCode, setVerifyCode] = useState('');
@@ -51,9 +55,12 @@ export default function Register() {
     const [avatarUploading, setAvatarUploading] = useState(false);
 
     // Global
-    const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+
+    const clearErrors = () => setFieldErrors({});
+    const setFieldError = (field, msg) => setFieldErrors((prev) => ({ ...prev, [field]: msg }));
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -148,12 +155,24 @@ export default function Register() {
     // ─── Step 1 submit – validate info + register ─────────────────────────────
     const handleStep1 = async (e) => {
         e.preventDefault();
-        setError('');
+        clearErrors();
         setSuccessMessage('');
-        if (!fullname.trim()) return setError('Lütfen adınızı ve soyadınızı girin.');
-        if (!email.trim()) return setError('Lütfen e-posta adresinizi girin.');
-        if (phoneDigits.length < 10) return setError('Lütfen geçerli bir telefon numarası girin (10 rakam).');
-        if (password.length < 6) return setError('Şifre en az 6 karakter olmalıdır.');
+
+        // ─── Client-side validation ───────────────────────────────────
+        let hasError = false;
+        if (!fullname.trim()) { setFieldError('fullname', 'Ad soyad boş bırakılamaz.'); hasError = true; }
+        if (!email.trim()) {
+            setFieldError('email', 'E-posta adresi boş bırakılamaz.');
+            hasError = true;
+        } else if (!isValidEmail(email)) {
+            setFieldError('email', 'Geçerli bir e-posta adresi girin. (örn. ad@alan.com)');
+            hasError = true;
+        }
+        if (phoneDigits.length < 10) { setFieldError('mobile', 'Geçerli bir telefon numarası girin (10 rakam).'); hasError = true; }
+        if (password.length < 6) { setFieldError('password', 'Şifre en az 6 karakter olmalıdır.'); hasError = true; }
+        if (!acceptKvkk) { setFieldError('acceptKvkk', 'Devam etmek için KVKK metnini onaylamanız gerekir.'); hasError = true; }
+        if (!acceptTerms) { setFieldError('acceptTerms', 'Devam etmek için bu alanı onaylamanız gerekir.'); hasError = true; }
+        if (hasError) return;
 
         setLoading(true);
         try {
@@ -174,7 +193,10 @@ export default function Register() {
 
             setStep(2);
         } catch (err) {
-            setError(err.response?.data?.message || 'Hesap oluşturulurken beklenmedik bir hata oluştu.');
+            const errCode = err.response?.data?.errCode;
+            const fallback = err.response?.data?.message || 'Hesap oluşturulurken beklenmedik bir hata oluştu.';
+            const { field, message } = resolveApiError(errCode, fallback);
+            setFieldError(field, message);
         } finally {
             setLoading(false);
         }
@@ -182,21 +204,21 @@ export default function Register() {
 
     // ─── Step 2: resend code ──────────────────────────────────────────────────
     const handleResendCode = async () => {
-        setError('');
+        setFieldError('verifyCode', '');
         setSuccessMessage('');
         try {
             await verificationService.startMobileVerification(email);
             setSuccessMessage('Doğrulama kodu tekrar gönderildi.');
             startCountdown();
         } catch (err) {
-            setError(err.response?.data?.message || 'Kod gönderilirken bir hata oluştu.');
+            setFieldError('_generic', err.response?.data?.message || 'Kod gönderilirken bir hata oluştu.');
         }
     };
 
     // ─── Step 2: verify code → auto-login ────────────────────────────────────
     const handleVerify = async (e) => {
         e.preventDefault();
-        setError('');
+        setFieldError('verifyCode', '');
         setVerifyLoading(true);
         try {
             const result = await verificationService.completeMobileVerification(email, verifyCode);
@@ -214,10 +236,13 @@ export default function Register() {
                 }
                 setStep(3);
             } else {
-                setError('Doğrulama başarısız oldu. Lütfen tekrar deneyin.');
+                setFieldError('verifyCode', 'Doğrulama başarısız oldu. Lütfen tekrar deneyin.');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Geçersiz doğrulama kodu.');
+            const errCode = err.response?.data?.errCode;
+            const fallback = err.response?.data?.message || 'Geçersiz doğrulama kodu.';
+            const { field, message } = resolveApiError(errCode, fallback);
+            setFieldError(field === 'verifyCode' ? 'verifyCode' : '_generic', message);
         } finally {
             setVerifyLoading(false);
         }
@@ -288,14 +313,14 @@ export default function Register() {
     return (
         <AuthLayout>
             <div className="w-full">
-                <h1 className="text-3xl font-bold text-zinc-900 mb-2 mt-4 tracking-tight">Kayıt Ol</h1>
-                <p className="text-zinc-500 mb-8 text-[15px]">
+                <h1 className="text-3xl font-extrabold text-zinc-900 mb-2 mt-4 tracking-tight">Kayıt Ol</h1>
+                <p className="text-zinc-900 mb-8 text-[15px]">
                     Masa'ya katılın ve yakınınızdaki yeni deneyimleri keşfetmeye hemen başlayın.
                 </p>
 
-                {error && (
+                {fieldErrors._generic && (
                     <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-[14px] font-medium border border-red-100/50 leading-relaxed shadow-sm">
-                        {error}
+                        {fieldErrors._generic}
                     </div>
                 )}
                 {successMessage && (
@@ -306,31 +331,31 @@ export default function Register() {
 
                 {/* ── Step 1: Bilgiler (Name, Email, Phone, Password) ── */}
                 {step === 1 && (
-                    <form onSubmit={handleStep1} className="space-y-4">
+                    <form onSubmit={handleStep1} className="space-y-4" noValidate>
                         <Input
                             id="fullname"
-                            label="Ad Soyad"
                             type="text"
                             value={fullname}
-                            onChange={(e) => setFullname(e.target.value)}
-                            placeholder="Adınızı ve soyadınızı girin"
-                            required
+                            onChange={(e) => { setFullname(e.target.value); setFieldError('fullname', ''); }}
+                            placeholder="Ad Soyad"
+                            error={fieldErrors.fullname}
                         />
+                        <p className="text-[12px] text-zinc-400 leading-relaxed -mt-2 ml-1">
+                            Masa Topluluk kuralları gereği gerçek ad soyad bilgisi girmek zorunludur. Anonim veya sahte isimle oluşturulan hesaplar bloke edilecektir.
+                        </p>
                         <Input
                             id="email"
-                            label="E-posta"
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => { setEmail(e.target.value); setFieldError('email', ''); }}
                             className={isSocial ? 'bg-zinc-100 text-zinc-500 cursor-not-allowed' : ''}
-                            placeholder="E-posta adresinizi girin"
-                            required
+                            placeholder="E-Posta"
+                            error={fieldErrors.email}
                             readOnly={isSocial}
                         />
 
                         {/* ── Phone field with country code selector ── */}
                         <div>
-                            <label className="block text-[13px] font-semibold text-zinc-700 mb-1.5">Telefon Numarası</label>
                             <div className="flex rounded-xl overflow-hidden border border-zinc-200 bg-white focus-within:ring-2 focus-within:ring-black/10 focus-within:border-zinc-400 transition-all">
                                 <select
                                     value={countryCode}
@@ -352,22 +377,23 @@ export default function Register() {
                                     type="tel"
                                     inputMode="numeric"
                                     value={formatPhoneDisplay(phoneDigits)}
-                                    onChange={handlePhoneInput}
-                                    placeholder="545-403-5730"
+                                    onChange={(e) => { handlePhoneInput(e); setFieldError('mobile', ''); }}
+                                    placeholder="Cep Telefonu"
                                     className="flex-1 px-4 py-3 text-[14px] text-zinc-900 font-medium placeholder:text-zinc-400 focus:outline-none bg-transparent"
-                                    required
                                 />
                             </div>
                         </div>
+                        {fieldErrors.mobile && (
+                            <p className="text-xs text-red-500 ml-1 font-medium -mt-2">{fieldErrors.mobile}</p>
+                        )}
 
                         <Input
                             id="password"
-                            label="Şifre"
                             type={showPassword ? 'text' : 'password'}
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="En az 6 karakter"
-                            required
+                            onChange={(e) => { setPassword(e.target.value); setFieldError('password', ''); }}
+                            placeholder="Şifre"
+                            error={fieldErrors.password}
                             suffix={
                                 <button
                                     type="button"
@@ -390,7 +416,33 @@ export default function Register() {
                             }
                         />
 
-                        <Button type="submit" disabled={loading} className="w-full mt-4 h-[52px] !rounded-xl">
+                        {/* ── Agreements ── */}
+                        <div className="flex flex-col gap-3 pt-1">
+                            <Checkbox
+                                id="accept-kvkk"
+                                checked={acceptKvkk}
+                                onChange={(e) => { setAcceptKvkk(e.target.checked); setFieldError('acceptKvkk', ''); }}
+                                error={fieldErrors.acceptKvkk}
+                                label={
+                                    <span>
+                                        Kişisel verilerimin <a href="/kvkk" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-zinc-900 transition-colors">KVKK Aydınlatma Metni</a> kapsamında işlendiğini, <a href="/kvkk" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-zinc-900 transition-colors">Kullanıcı Sözleşmesi</a> ve <a href="/kvkk" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-zinc-900 transition-colors">Gizlilik Polititasını</a> okuduğumu ve onayladığımı kabul ediyorum.
+                                    </span>
+                                }
+                            />
+                            <Checkbox
+                                id="accept-terms"
+                                checked={acceptTerms}
+                                onChange={(e) => { setAcceptTerms(e.target.checked); setFieldError('acceptTerms', ''); }}
+                                error={fieldErrors.acceptTerms}
+                                label={
+                                    <span>
+                                        E-posta ve SMS gönderimleri aracılığıyla güncel etkinliklerden ve kampanyalardan haberdar olmak istiyorum.
+                                    </span>
+                                }
+                            />
+                        </div>
+
+                        <Button type="submit" disabled={loading} className="w-full mt-4 h-[52px] !rounded-full">
                             {loading ? 'Hesap oluşturuluyor...' : 'Devam Et'}
                         </Button>
 
@@ -407,10 +459,10 @@ export default function Register() {
                                 onClick={handleGoogleLogin}
                                 type="button"
                                 variant="secondary"
-                                className="w-full h-[52px] !rounded-xl flex items-center justify-center space-x-2.5"
+                                className="w-full h-[52px] !rounded-full flex items-center justify-center space-x-2.5"
                             >
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-[18px] h-[18px]" />
-                                <span className="text-[15px]">Google ile Devam Et</span>
+                                <span className="text-[15px]">Google ile Giriş Yap</span>
                             </Button>
                         </div>
 
@@ -438,22 +490,21 @@ export default function Register() {
                             <strong>{mobile}</strong> numarasına gönderilen 6 haneli kodu girin.
                         </p>
 
-                        <form onSubmit={handleVerify} className="space-y-4">
+                        <form onSubmit={handleVerify} className="space-y-4" noValidate>
                             <Input
                                 id="verify-code"
-                                label="Doğrulama Kodu"
                                 type="text"
                                 value={verifyCode}
-                                onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                onChange={(e) => { setVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6)); setFieldError('verifyCode', ''); }}
                                 placeholder="123456"
-                                required
                                 maxLength={6}
                                 autoFocus
+                                error={fieldErrors.verifyCode}
                             />
                             <Button
                                 type="submit"
                                 disabled={verifyLoading || verifyCode.length < 6}
-                                className="w-full h-[52px] !rounded-xl"
+                                className="w-full h-[52px] !rounded-full"
                             >
                                 {verifyLoading ? 'Doğrulanıyor...' : 'Doğrula ve Devam Et'}
                             </Button>
@@ -524,7 +575,7 @@ export default function Register() {
                             <Button
                                 onClick={handleAvatarUpload}
                                 disabled={avatarUploading}
-                                className="w-full h-[52px] !rounded-xl"
+                                className="w-full h-[52px] !rounded-full"
                             >
                                 {avatarUploading
                                     ? 'Yükleniyor...'
@@ -537,7 +588,7 @@ export default function Register() {
                                     type="button"
                                     variant="ghost"
                                     onClick={handleSkipAvatar}
-                                    className="w-full h-[44px] !rounded-xl text-[14px]"
+                                    className="w-full h-[44px] !rounded-full text-[14px]"
                                 >
                                     Şimdilik Atla
                                 </Button>

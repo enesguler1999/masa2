@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { loginCarouselSlideService } from '../../services/masaSettingsService';
 import MasaSpinner from '../common/MasaSpinner';
 
@@ -60,9 +61,9 @@ export default function AuthCarousel() {
         <div className="relative w-full h-full flex flex-col justify-center items-center overflow-hidden bg-zinc-950 p-8 sm:p-12">
 
             {/* Logo on top left */}
-            <div className="absolute top-8 left-8 z-20">
+            <Link to="/" className="absolute top-8 left-8 z-20">
                 <img src="/images/logo/logo-masa-white.svg" alt="Masa" className="h-[28px]" />
-            </div>
+            </Link>
 
             <div className="relative z-10 w-full max-w-[420px] flex flex-col items-center">
 

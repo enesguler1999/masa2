@@ -159,6 +159,11 @@
     }
 }
 
+/* Global Font */
+body {
+    font-family: "Nunito", sans-serif;
+}
+
 /* Global cursor fix — Tailwind v4 no longer sets cursor:pointer on buttons by default */
 button,
 [role="button"],

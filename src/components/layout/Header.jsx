@@ -118,7 +118,7 @@ export default function Header() {
                 <div className="flex items-center gap-4">
 
                     {/* Masa Oluştur - always visible */}
-                    <button className={`flex items-center gap-2.5 transition-colors font-bold text-[14px] hover:opacity-80 ${isHomePage ? 'text-zinc-900' : 'text-white'}`}>
+                    <button className={`flex items-center gap-2.5 transition-colors font-extrabold text-[16px] hover:opacity-80 ${isHomePage ? 'text-zinc-900' : 'text-white'}`}>
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${circleIconBgClass}`}>
                             <Plus size={18} strokeWidth={3} />
                         </div>
@@ -144,7 +144,7 @@ export default function Header() {
                                 <span className={`absolute top-1.5 right-2 w-2 h-2 bg-orange-500 rounded-full border-[1.5px] ${isHomePage ? 'border-[#f3f3f3]' : 'border-zinc-900'}`}></span>
                             </button>
 
-                            <button className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors font-bold text-[14px] ${isHomePage ? 'bg-black/5 hover:bg-black/10 text-zinc-900' : 'bg-white/10 hover:bg-white/20 text-white'}`}>
+                            <button className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors font-extrabold text-[16px] ${isHomePage ? 'bg-black/5 hover:bg-black/10 text-zinc-900' : 'bg-white/10 hover:bg-white/20 text-white'}`}>
                                 <MessageCircle size={18} strokeWidth={2.5} className={isHomePage ? 'fill-zinc-900 text-zinc-900' : 'fill-white text-white'} />
                                 <span className="hidden sm:inline">Mesajlar</span>
                             </button>
