@@ -75,7 +75,7 @@ export default function Login() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
                         id="email"
-                        label="E-posta veya Kullanıcı Adı"
+                        label="E-posta"
                         type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}

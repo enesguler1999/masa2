@@ -8,6 +8,9 @@ import { bucketService } from '../../services/bucketService';
 import { profileService } from '../../services/profileService';
 import Input from '../../components/forms/Input';
 import { useUser } from '../../context/UserContext';
+import { supportedCountryService } from '../../services/masaSettingsService';
+
+const FALLBACK_COUNTRIES = [{ id: 'tr', code: '+90', country: 'Türkiye', sortOrder: 1 }];
 
 const RESEND_COOLDOWN = 60;
 
@@ -21,6 +24,10 @@ export default function Register() {
     const [mobile, setMobile] = useState('');
     const [countryCode, setCountryCode] = useState('+90');
     const [phoneDigits, setPhoneDigits] = useState('');
+
+    // Supported countries for phone dropdown
+    const [countries, setCountries] = useState(FALLBACK_COUNTRIES);
+    const [countriesLoading, setCountriesLoading] = useState(true);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
@@ -65,6 +72,22 @@ export default function Register() {
             }
         }
     }, [isSocial]);
+
+    // Fetch supported countries from API
+    useEffect(() => {
+        supportedCountryService.list()
+            .then((data) => {
+                const list = data?.supportedCountries || [];
+                const sorted = [...list].sort((a, b) => a.sortOrder - b.sortOrder);
+                if (sorted.length > 0) {
+                    setCountries(sorted);
+                    // Keep countryCode in sync — default to first entry
+                    setCountryCode(sorted[0].code);
+                }
+            })
+            .catch(() => { /* keep fallback */ })
+            .finally(() => setCountriesLoading(false));
+    }, []);
 
     // ─── Countdown ───────────────────────────────────────────────────────────
     const startCountdown = () => {
@@ -315,9 +338,14 @@ export default function Register() {
                                         setCountryCode(e.target.value);
                                         setMobile(`${e.target.value}${phoneDigits}`);
                                     }}
-                                    className="bg-zinc-50 border-r border-zinc-200 text-zinc-800 font-semibold text-[14px] px-3 py-3 focus:outline-none shrink-0"
+                                    disabled={countriesLoading}
+                                    className="bg-zinc-50 border-r border-zinc-200 text-zinc-800 font-semibold text-[14px] px-3 py-3 focus:outline-none shrink-0 disabled:opacity-60"
                                 >
-                                    <option value="+90">🇹🇷 +90</option>
+                                    {countries.map((c) => (
+                                        <option key={c.id ?? c.code} value={c.code}>
+                                            {c.code} {c.country}
+                                        </option>
+                                    ))}
                                 </select>
                                 <input
                                     id="mobile"

@@ -52,5 +52,6 @@ export const config = {
     get optionsApi() { return getServiceUrl('options'); },
     get socialApi() { return getServiceUrl('social'); },
     get ticketApi() { return getServiceUrl('ticket'); },
+    get masaSettingsApi() { return getServiceUrl('masasettings'); },
     get bucketApi() { return `${getBaseUrl()}/bucket`; }, // fallback for backwards compatibility
 };

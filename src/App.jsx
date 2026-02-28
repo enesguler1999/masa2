@@ -12,6 +12,7 @@ import ResetPasswordByEmail from './pages/Auth/ResetPasswordByEmail';
 import ResetPasswordByMobile from './pages/Auth/ResetPasswordByMobile';
 import ProfileDashboard from './pages/Profile/ProfileDashboard';
 import MessageTest from './pages/Test/MessageTest';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function Home() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path="/reset-password/email" element={<ResetPasswordByEmail />} />
         <Route path="/reset-password/mobile" element={<ResetPasswordByMobile />} />
         <Route path="/profile" element={<ProfileDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/components" element={<ComponentsPage />} />
         <Route path="/test/messagetest" element={<MessageTest />} />
       </Routes>

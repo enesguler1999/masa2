@@ -9,6 +9,7 @@ import Modal from '../components/common/Modal';
 import Table, { TableHead, TableBody, TableRow, TableHeader, TableCell } from '../components/common/Table';
 import SearchBar from '../components/forms/SearchBar';
 import Slider from '../components/forms/Slider';
+import MasaSpinner from '../components/common/MasaSpinner';
 
 function ComponentsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,6 +18,55 @@ function ComponentsPage() {
 
     return (
         <Layout>
+
+            {/* ── Spinners & Loaders section (full width) ── */}
+            <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-6">Spinners & Loaders</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    {/* Dark variant */}
+                    <Card className="flex flex-col gap-4">
+                        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Dark (light bg)</p>
+                        <div className="flex items-end justify-around gap-6 py-4">
+                            <div className="flex flex-col items-center gap-3">
+                                <MasaSpinner size={56} color="#18181b" />
+                                <span className="text-xs text-zinc-400 font-mono">56px</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-3">
+                                <MasaSpinner size={80} color="#18181b" />
+                                <span className="text-xs text-zinc-400 font-mono">80px</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-3">
+                                <MasaSpinner size={112} color="#18181b" />
+                                <span className="text-xs text-zinc-400 font-mono">112px</span>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Light variant */}
+                    <Card noPadding>
+                        <div className="rounded-2xl bg-zinc-900 p-6 h-full flex flex-col gap-4">
+                            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Light (dark bg)</p>
+                            <div className="flex items-end justify-around gap-6 py-4">
+                                <div className="flex flex-col items-center gap-3">
+                                    <MasaSpinner size={56} light />
+                                    <span className="text-xs text-zinc-500 font-mono">56px</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-3">
+                                    <MasaSpinner size={80} light />
+                                    <span className="text-xs text-zinc-500 font-mono">80px</span>
+                                </div>
+                                <div className="flex flex-col items-center gap-3">
+                                    <MasaSpinner size={112} light />
+                                    <span className="text-xs text-zinc-500 font-mono">112px</span>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
+                </div>
+            </section>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 {/* Typography & Buttons Section */}

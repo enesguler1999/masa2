@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Plus, User, Bell, MessageCircle, ChevronDown, ChevronUp, CreditCard, KeyRound, LogOut, HelpCircle, Ticket, Pencil, Settings, UserMinus } from 'lucide-react';
+import { Plus, User, Bell, MessageCircle, ChevronDown, ChevronUp, CreditCard, KeyRound, LogOut, HelpCircle, Ticket, Pencil, Settings, UserMinus, LayoutDashboard } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { useUser } from '../../context/UserContext';
 
@@ -184,6 +184,17 @@ export default function Header() {
                                         </div>
 
                                         <div className="px-3 py-4 space-y-1.5 border-t border-white/50">
+
+                                            {/* Admin Panel – only for admin roles */}
+                                            {user?.roleId && ['admin', 'superAdmin', 'saasAdmin'].includes(user.roleId) && (
+                                                <Link
+                                                    to="/admin" onClick={() => setDropdownOpen(false)}
+                                                    className="flex items-center gap-4 px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white transition-colors mb-2"
+                                                >
+                                                    <LayoutDashboard size={20} strokeWidth={2.5} />
+                                                    <span className="font-bold text-[14px]">Yönetim Paneli</span>
+                                                </Link>
+                                            )}
 
                                             {/* Biletlerim & Masalarım */}
                                             <Link
